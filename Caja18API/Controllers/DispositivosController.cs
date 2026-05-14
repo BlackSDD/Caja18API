@@ -1,5 +1,6 @@
 ﻿using Caja18API.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -81,6 +82,49 @@ namespace Caja18API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-       
+
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] DispositivoPost Envio  )
+        {
+            try
+            {
+
+                var JsonEnvio = JsonSerializer.Serialize(Envio);
+
+                
+
+
+                var EnvioCompleto = new StringContent(
+                JsonEnvio,
+                Encoding.UTF8,
+                "application/json");
+
+
+                var response = await _httpClient.PostAsync($"https://api.restful-api.dev/objects", EnvioCompleto);
+
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode(500);
+                }
+
+                var respuesta = await response
+                    .Content
+                    .ReadAsStringAsync();
+
+                var salida = new
+                {
+                    message = "Dispositivo creado correctamente"
+                };
+
+                return Ok(salida);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
